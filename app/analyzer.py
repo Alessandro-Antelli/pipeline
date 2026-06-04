@@ -9,7 +9,3 @@ def analyze_text(text):
         "special_chars": len(re.findall(r'[^a-zA-Z0-9\s]', text)),
         "spaces": text.count(' ')
     }
-
-if __name__ == "__main__":
-    sample = "Ciao mondo! 123."
-    print(analyze_text(sample))
