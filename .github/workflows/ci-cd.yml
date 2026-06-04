@@ -35,11 +35,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          # Utilizziamo la funzione toLowerCase() per garantire che il nome sia conforme agli standard di GHCR
-          tags: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest
-          # Nota: GitHub Actions gestisce automaticamente la conversione in minuscolo
-          # se usi le variabili standard, ma se dovesse ancora fallire,
-          # usa direttamente la stringa: ghcr.io/alessandro-antelli/pipeline:latest
+          # FORZATO IN MINUSCOLO: ho sostituito il tuo nome con quello in minuscolo
+          tags: ghcr.io/alessandro-antelli/pipeline:latest
 
   deploy-to-snapdeploy:
     needs: build-and-push
