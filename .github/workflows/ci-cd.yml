@@ -1,0 +1,46 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with: { python-version: '3.11' }
+      - run: pip install -r requirements.txt
+      - name: Run tests
+        run: pytest
+
+  build-and-push:
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write # Necessario per scrivere nel registro di GitHub
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          # Questo salverà l'immagine nel tuo account GitHub
+          tags: ghcr.io/${{ github.repository }}:latest
+
+  deploy-to-snapdeploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger SnapDeploy Webhook
+        run: |
+          curl -X POST "${{ secrets.SNAPDEPLOY_WEBHOOK_URL }}"
